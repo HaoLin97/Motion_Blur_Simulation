@@ -360,7 +360,7 @@ if __name__ == '__main__':
             if not os.path.exists(dir):
                 os.makedirs(dir)
             e = exp/1000
-            print(e)
+            # print(e)
             # for x in range(0, 1000, 10):
 
             blurred = add_motion_blur(input_image=input, dx_dt=x, dy_dt=0, lux=lux, exposure_time=e)
