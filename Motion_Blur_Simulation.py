@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import os
 import scipy
+import argparse
 import skimage.morphology
 import skimage.filters
 import math
@@ -262,6 +263,7 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
     # Old Lux conversion - now redundant
     # photon_per_lux = 11300
     # dq_dt = photon_per_lux * lux
+
     quanta = lux_to_quanta(E_amb=lux, T_int=exposure_time)
 
     # Normalise the image and multiply it by quanta
@@ -328,75 +330,50 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
 
 
 if __name__ == '__main__':
-    # input = cv2.imread("exposure_30000_delay_0us_5.tiff", -1)
-    # # input = cv2.imread("star_1600.tif", -1)
-    # # input = cv2.imread("siemens_star_72.tif", -1)
-    # # input = cv2.imread("ac6e638d-7c84846d.jpg", -1)
-    #
-    # blurred = add_motion_blur(input_image=input, dx_dt=0, dy_dt=0, lux=200, exposure_time=0.01)
-    # # cv2.imwrite("blurred.png", blurred)
-    #
-    # output = add_camera_noise(blurred)
-    # # filename = "star_exp_{}ms_dx_{}_dy_{}_lux_{}.png".format(int(e * 1000), x, y, lux)
-    # cv2.imwrite("30ms_200lux_real_simto10ms.png", output)
 
+    # Define the input file - in this case a siemens star chart is used as example
+    input = cv2.imread("siemens_star_72.tif", -1)
 
-    # input = cv2.imread("slanted_edge_1x2_cratio_4_gamma_1.png", -1)
-    # input = cv2.imread("star_1600.tif", -1)
-    # input = cv2.imread("siemens_star_72.tif", -1)
-    # input = cv2.imread("ac6e638d-7c84846d.jpg", -1)
-    # exp = [0.01, 0.02, 0.03, 0.04]
-    # luxs = [1, 5, 10, 20, 30, 40, 50, 100, 200]
-    # blurs = [150, 500, 1000]
-    # for blur in blurs:
-    # for blur in range(0, 1000, 10):
-        # for lux in luxs:
-    # lux = 50
-    # y = 1000
-    # x = 1000
-    # exp = 0
-    # px_size = 50
+    # Defining the output image path and name
+    output_filename = "output.jpg"
 
-    # for p in [32,50,100]:
-    #     px_size = 100
-    #
-    #     # input = cv2.imread("Stop_{}x{}.png".format(px_size,px_size), -1)
-    #
-    #
-    #     # exp_list = [10, 20, 30, 40]
-    #     # dir = "H:/Pycharm_Sim_Results/new_model/slanted/{}lux_{}blur".format(lux, x)
-    #     # H:/Pycharm_Sim_Results\new_model\new_stop\100x100_50lux_30ms
-    #     dir = "H:/Pycharm_Sim_Results/new_model/new_stop/{}x{}_{}lux_{}blur".format(px_size,px_size,lux, x)
-    #     # for exp in range(0,100,1):
-    #     if not os.path.exists(dir):
-    #         os.makedirs(dir)
-    #     for exp in range(0, 100):
-    #         exp = 30
-    #         e = exp/1000
-    #     # print(e)
-    #     # for x in range(0, 1000, 10):
-    #
-    #         blurred = add_motion_blur(input_image=input, dx_dt=x, dy_dt=y, lux=lux, exposure_time=e)
-    #         # cv2.imwrite("blurred.png", blurred)
-    #
-    #         output = add_camera_noise(blurred)
-    #         # filename = "slanted_exp_{}ms_dx_{}_dy_{}_lux_{}_PE_{}.png".format(int(e * 1000), x, y, lux, PE)
-    #         filename = "{}_stop_exp_{}ms_dx_{}_dy_{}_lux_{}_PE_{}.png".format(px_size, int(e * 1000), x, y, lux, PE)
-    #         cv2.imwrite("output.png", output)
-    #
-    #         print(filename)
-    #         break
-    #         # cv2.imwrite(os.path.join(dir, filename), output)
-    for i in [10,20,30,40]:
-        for j in [10,20,30,40]:
-            sim_exp = i
-            exp = j
-            input = cv2.imread("exposure_{}.tiff".format(exp))
-            e = sim_exp / 1000
-            blurred = add_motion_blur(input_image=input, dx_dt=0, dy_dt=0, lux=50, exposure_time=e)
-            output = add_camera_noise(blurred)
-            filename = "soundlab_exp{}_simexp{}.png".format(exp, sim_exp)
-            cv2.imwrite(filename, output)
+    # Define the desired exposure time in ms
+    exposure = 30
+    e = exposure # Exposure time converted to seconds
+
+    # Define the desired motion blur - in pixels per second
+    dx = 0  # Horizontal Motion Blur
+    dy = 0  # Vertical Motion Blur
+
+    # Defining the desired ambient lighting
+    lux = 50
+
+    parser = argparse.ArgumentParser(description='Process an image with motion blur and camera noise.')
+    parser.add_argument('cli', type=str, help='to use the cli type yes')
+    parser.add_argument('input_file', type=str, help='Path to the input image file')
+    parser.add_argument('exposure', type=float, help='Desired exposure time in ms')
+    parser.add_argument('dx', type=float, help='Horizontal motion blur in pixels per second')
+    parser.add_argument('dy', type=float, help='Vertical motion blur in pixels per second')
+    parser.add_argument('lux', type=float, help='Ambient lighting in lux')
+    parser.add_argument('output_file', type=str, help='Path to save the output image')
+
+    args = parser.parse_args()
+    if args.cli is not None:
+        input = args.input_file
+        exposure = args.exposure
+        dx = args.dx
+        dy = args.dy
+        lux = args.lux
+        output_filename = args.output_file
+
+    # Adding motion blur to the image and simulating different exposures and lighting
+    blurred = add_motion_blur(input_image=input, dx_dt=dx, dy_dt=dy, lux=lux, exposure_time=e)
+
+    # Adding noise to the image
+    output = add_camera_noise(blurred)
+
+    # Saving the output
+    cv2.imwrite(output_filename, output)
 
 
 

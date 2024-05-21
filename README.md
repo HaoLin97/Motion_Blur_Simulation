@@ -63,7 +63,7 @@ Copy code
 python simulate.py --input path/to/original.jpg --output path/to/simulated.jpg --exposure 0.01 --lighting 100 --dx 50
 Simulated Image:
 
-#### Assumptions
+## Assumptions
 The simulation tool operates under the following assumptions:
 
 Monochromatic Scene: The simulation assumes a monochromatic (single color channel) scene.
@@ -78,10 +78,10 @@ Make your changes.
 Submit a pull request with a detailed description of your changes.
 Please ensure that your code adheres to the project's coding standards and includes appropriate tests.
 
-#### License
+## License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-#### Acknowledgments
+## Acknowledgments
 We would like to thank all the contributors and the open-source community for their invaluable support and contributions to this project.
 
 For any questions or issues, please open an issue on this repository or contact the maintainer.
