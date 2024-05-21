@@ -11,12 +11,13 @@ def calc_camera_afov(sensor_height, focal_length):
 if __name__ == '__main__':
     # Current values and settings simulate the sound lab setup
     # Inputs: FOV of camera, resolution of camera, distance between camera and target
-    exposure_time = 30000  # in us
-    target_x_real = 0.84  # in m
-    target_y_real = 0.78  # in m
-    target_speed = 0.401  # in ms-1   - moving 1 degree is equal to 4.01 cms-1
+    # standard car 4.9x1.8
+    exposure_time = 15000  # in us
+    target_x_real = 4.9  # in m
+    target_y_real = 18  # in m
+    target_speed = 27.778  # in ms-1   - moving 1 degree is equal to 4.01 cms-1
     target_direction = 'Horizontal'  # TODO Currently coded for horizontal only
-    distance = 2.3  # distance between camera and target in m
+    distance = 50  # distance between camera and target in m
     # Calculated
     camera_horizontal_afov = 99.32  # in degree
     camera_vertical_afov = 63.67  # in degree

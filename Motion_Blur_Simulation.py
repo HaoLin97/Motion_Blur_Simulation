@@ -178,7 +178,7 @@ def lux_to_quanta(lens_f=1.4, lens_focal_length=15e-3, pixel_pitch=3.45e-6, to=1
     global PE
     PE = int(PEp)
     # print(PEp)
-    print("Lux:{}, Tint:{}, PEp:{}".format(lux, T_int, PEp))
+    # print("Lux:{}, Tint:{}, PEp:{}".format(lux, T_int, PEp))
     return PEp
 
 
@@ -242,6 +242,8 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
     else:
         target_rows, target_cols = input_image.shape
         gray = input_image
+    cv2.imwrite("input.jpg", gray)
+
     # Mask
     scale_factor = 2
     # Create 18% grey in mask
@@ -306,7 +308,7 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
 
         # Creating kernel of ones at the center of the kernel
         blur_kernal[(int(motion_length) - 1) // 2, :] = np.ones(int(motion_length), dtype=np.float32)
-
+        cv2.imwrite("blur_kernel.png", blur_kernal*255)
         # Rotating the kernel to the direction/angle of blur
         # getRotationMatrix2D creates a transformation matrix, in which the kernel will be rotated by
         blur_kernal = cv2.warpAffine(blur_kernal,
@@ -316,12 +318,12 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
 
         # Normalising the kernel
         blur_kernal = blur_kernal * (1.0 / np.sum(blur_kernal))
+        cv2.imwrite("blur_kernel_rotated_diag.png", blur_kernal*255*32)
         # Applying blur kernel to the image
         image = cv2.filter2D(image, -1, blur_kernal)
 
     # image = check_clipping(image)
 
-    # cv2.imwrite("motion_blur.png", image)
     return image
 
 
@@ -339,7 +341,7 @@ if __name__ == '__main__':
     # cv2.imwrite("30ms_200lux_real_simto10ms.png", output)
 
 
-    input = cv2.imread("slanted_edge_1x2_cratio_4_gamma_1.png", -1)
+    # input = cv2.imread("slanted_edge_1x2_cratio_4_gamma_1.png", -1)
     # input = cv2.imread("star_1600.tif", -1)
     # input = cv2.imread("siemens_star_72.tif", -1)
     # input = cv2.imread("ac6e638d-7c84846d.jpg", -1)
@@ -347,27 +349,54 @@ if __name__ == '__main__':
     # luxs = [1, 5, 10, 20, 30, 40, 50, 100, 200]
     # blurs = [150, 500, 1000]
     # for blur in blurs:
-    for blur in range(0, 1000, 10):
+    # for blur in range(0, 1000, 10):
         # for lux in luxs:
-            lux = 20
-            y = 0
-            x = blur
-            exp = 30
-            # exp_list = [10, 20, 30, 40]
-            # dir = "H:/Pycharm_Sim_Results/new_model/slanted/{}lux_{}blur".format(lux, x)
-            dir = "H:/Pycharm_Sim_Results/new_model/slanted/{}lux_{}ms".format(lux, exp)
-            # for exp in range(0,100,1):
-            if not os.path.exists(dir):
-                os.makedirs(dir)
-            e = exp/1000
-            # print(e)
-            # for x in range(0, 1000, 10):
+    # lux = 50
+    # y = 1000
+    # x = 1000
+    # exp = 0
+    # px_size = 50
 
-            blurred = add_motion_blur(input_image=input, dx_dt=x, dy_dt=0, lux=lux, exposure_time=e)
-            # cv2.imwrite("blurred.png", blurred)
-
+    # for p in [32,50,100]:
+    #     px_size = 100
+    #
+    #     # input = cv2.imread("Stop_{}x{}.png".format(px_size,px_size), -1)
+    #
+    #
+    #     # exp_list = [10, 20, 30, 40]
+    #     # dir = "H:/Pycharm_Sim_Results/new_model/slanted/{}lux_{}blur".format(lux, x)
+    #     # H:/Pycharm_Sim_Results\new_model\new_stop\100x100_50lux_30ms
+    #     dir = "H:/Pycharm_Sim_Results/new_model/new_stop/{}x{}_{}lux_{}blur".format(px_size,px_size,lux, x)
+    #     # for exp in range(0,100,1):
+    #     if not os.path.exists(dir):
+    #         os.makedirs(dir)
+    #     for exp in range(0, 100):
+    #         exp = 30
+    #         e = exp/1000
+    #     # print(e)
+    #     # for x in range(0, 1000, 10):
+    #
+    #         blurred = add_motion_blur(input_image=input, dx_dt=x, dy_dt=y, lux=lux, exposure_time=e)
+    #         # cv2.imwrite("blurred.png", blurred)
+    #
+    #         output = add_camera_noise(blurred)
+    #         # filename = "slanted_exp_{}ms_dx_{}_dy_{}_lux_{}_PE_{}.png".format(int(e * 1000), x, y, lux, PE)
+    #         filename = "{}_stop_exp_{}ms_dx_{}_dy_{}_lux_{}_PE_{}.png".format(px_size, int(e * 1000), x, y, lux, PE)
+    #         cv2.imwrite("output.png", output)
+    #
+    #         print(filename)
+    #         break
+    #         # cv2.imwrite(os.path.join(dir, filename), output)
+    for i in [10,20,30,40]:
+        for j in [10,20,30,40]:
+            sim_exp = i
+            exp = j
+            input = cv2.imread("exposure_{}.tiff".format(exp))
+            e = sim_exp / 1000
+            blurred = add_motion_blur(input_image=input, dx_dt=0, dy_dt=0, lux=50, exposure_time=e)
             output = add_camera_noise(blurred)
-            filename = "slanted_exp_{}ms_dx_{}_dy_{}_lux_{}_PE_{}.png".format(int(e * 1000), x, y, lux, PE)
-            print(filename)
-            cv2.imwrite(os.path.join(dir, filename), output)
+            filename = "soundlab_exp{}_simexp{}.png".format(exp, sim_exp)
+            cv2.imwrite(filename, output)
+
+
 
