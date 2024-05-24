@@ -233,17 +233,16 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
     :param lux: Ambient Lux
     :return: Motion blurred image
     """
-    # cv2.imwrite("input.png", input_image)
+
     if len(input_image.shape) == 3:
         gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
         gray[gray == 0] = 1
         target_rows, target_cols = gray.shape
 
-        # cv2.imwrite("gray.png", gray)
     else:
         target_rows, target_cols = input_image.shape
         gray = input_image
-    cv2.imwrite("input.jpg", gray)
+
 
     # Mask
     scale_factor = 2
@@ -276,15 +275,13 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
 
 
     image = mask.astype(np.uint16)
-    # cv2.imwrite("masked.png", image)
 
     # Optical blur
     # Got psf array from matlab
     psf = np.array([[0.0250785810238330, 0.145343947430219, 0.0250785810238330],
             [0.145343947430219, 0.318309886183791, 0.145343947430219],
             [0.0250785810238330, 0.145343947430219, 0.0250785810238330]])
-    # image_pre_optical = image
-    # cv2.imwrite("optical_blur.png", image)
+
     image = scipy.ndimage.convolve(image, psf, mode='nearest')
 
     # Motion Blur
@@ -310,7 +307,7 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
 
         # Creating kernel of ones at the center of the kernel
         blur_kernal[(int(motion_length) - 1) // 2, :] = np.ones(int(motion_length), dtype=np.float32)
-        cv2.imwrite("blur_kernel.png", blur_kernal*255)
+
         # Rotating the kernel to the direction/angle of blur
         # getRotationMatrix2D creates a transformation matrix, in which the kernel will be rotated by
         blur_kernal = cv2.warpAffine(blur_kernal,
@@ -320,7 +317,7 @@ def add_motion_blur(input_image, exposure_time=0.03, dx_dt=0, dy_dt=0, lux=200):
 
         # Normalising the kernel
         blur_kernal = blur_kernal * (1.0 / np.sum(blur_kernal))
-        cv2.imwrite("blur_kernel_rotated_diag.png", blur_kernal*255*32)
+
         # Applying blur kernel to the image
         image = cv2.filter2D(image, -1, blur_kernal)
 
@@ -339,7 +336,7 @@ if __name__ == '__main__':
 
     # Define the desired exposure time in ms
     exposure = 30
-    e = exposure # Exposure time converted to seconds
+    e = exposure/1000  # Exposure time converted to seconds
 
     # Define the desired motion blur - in pixels per second
     dx = 0  # Horizontal Motion Blur
@@ -349,7 +346,7 @@ if __name__ == '__main__':
     lux = 50
 
     parser = argparse.ArgumentParser(description='Process an image with motion blur and camera noise.')
-    parser.add_argument('cli', type=str, help='to use the cli type yes')
+    parser.add_argument('cli', type=str, help='To use the cli type yes')
     parser.add_argument('input_file', type=str, help='Path to the input image file')
     parser.add_argument('exposure', type=float, help='Desired exposure time in ms')
     parser.add_argument('dx', type=float, help='Horizontal motion blur in pixels per second')
