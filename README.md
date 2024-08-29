@@ -58,8 +58,6 @@ Original Image:
 
 Command:
 
-sh
-Copy code
 python simulate.py --input path/to/original.jpg --output path/to/simulated.jpg --exposure 0.01 --lighting 100 --dx 50
 Simulated Image:
 
